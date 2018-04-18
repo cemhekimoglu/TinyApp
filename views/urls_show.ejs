@@ -1,0 +1,21 @@
+<html lang="en">
+<head>
+  <title>TinyApp</title>
+</head>
+<body>
+
+<header>
+  <% include ../views/partials/_header.ejs %>
+</header>
+
+  <ul>
+      <li>
+        <a href=""><%=shortURL%> </a>
+        <form method="POST" action="/urls/<%= shortURL %>/update">
+          <input type="text" name="longURL" placeholder="<%= longURL %>">
+          <button>UPDATE</button></form>
+      </li>
+  </ul>
+
+</body>
+</html>
