@@ -25,6 +25,56 @@ var urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
+const users = {
+  "userRandomID": {
+    id: "userRandomID",
+    email: "user@example.com",
+    password: "purple-monkey-dinosaur"
+  },
+ "user2RandomID": {
+    id: "user2RandomID",
+    email: "user2@example.com",
+    password: "dishwasher-funk"
+  },
+   "a": {
+    id: "a",
+    email: "a@g",
+    password: "a"
+  }
+};
+
+var testEmail = function (email) {
+  for(key in users) {
+    console.log(users[key]["email"])
+    if (users[key]["email"] == email) {
+      return true
+    }
+    return
+  }
+}
+
+var testPassword = function (password) {
+  for(key in users) {
+    console.log(users[key]["password"])
+  }
+    return (users[key]["password"] === password)
+}
+
+var userLogin = function (email, password) {
+  for(key in users) {
+    return ( (users[key]["password"] === password) && (users[key]["email"] === email) )
+  }
+}
+
+var retrieveUserId = function (email, password) {
+  for(key in users) {
+    if (users[key]["password"] == password && users[key]['email'] == email) {
+      console.log('user has been found' , users[key])
+      var user_id = users[key]['id']
+      return user_id
+    }
+  }
+}
 
 app.get("/", (req, res) => {
   res.end("Hello!");
@@ -39,18 +89,34 @@ app.get("/hello", (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
+  key = req.cookies["user_id"]
+  // console.log("/urls", req.cookies)
   let templateVars = {
     urls: urlDatabase,
-    username: req.cookies["username"]
+    user: users[key]
   };
   res.render("urls_index", templateVars);
 });
 
+app.get("/urls/register", (req, res) => {
+  let templateVars = {
+    user: users[req.cookies[users]],
+  };
+  res.render("urls_registration", templateVars);
+});
+
+app.get("/urls/login", (req, res) => {
+  let templateVars = {
+    user: users[req.cookies[users]],
+  };
+  res.render("urls_login", templateVars);
+});
+
 app.get("/urls/new", (req, res) => {
   let templateVars = {
-    username: req.cookies["username"]
-  }
-  res.render("urls_new");
+    user: users[req.cookies["user_id"]]
+  };
+  res.render("urls_new", templateVars);
 });
 
 app.get("/u/:shortURL", (req, res) => {
@@ -62,7 +128,7 @@ app.get("/urls/:id", (req, res) => {
   let templateVars = {
     shortURL: req.params.id,
     longURL: urlDatabase[req.params.id],
-    username: req.cookies["username"],
+    user: users[req.cookies["user_id"]],
   };
   res.render("urls_show", templateVars);
 });
@@ -73,8 +139,47 @@ app.post("/urls", (req, res) => {
   res.redirect('/urls');
 });
 
+
+
+app.post("/register", (req, res) => {
+  var newId = generateRandomString();
+  var foundEmail = testEmail(req.body.email)
+
+
+
+  if(req.body.email.length === 0 || req.body.password.length === 0) {
+  res.status(400).send('error : email and password can not be empty')
+  } else if(foundEmail == true) {
+      res.status(400).send('error : this email is already registered')
+    } else {
+
+    users[newId] = {
+    id: newId,
+    email: req.body.email,
+    password: req.body.password
+  }
+    res.cookie('user_id', newId);
+    res.redirect('/urls');
+    }
+});
+
+app.post("/login", (req, res) => {
+  var userValid = userLogin(req.body.email, req.body.password)
+  if(req.body.email.length === 0 || req.body.password.length === 0) {
+  res.status(400).send('error 400 : email and password can not be empty')
+  } else if(userValid) {
+    console.log('email', foundEmail, 'password', foundPassword)
+    res.status(403).send('error 403 : email or password does not match')
+  } else {
+
+    var user_id = retrieveUserId(req.body.email, req.body.password)
+    res.cookie('user_id', user_id);
+    res.redirect('/urls');
+  }
+});
+
 app.post("/urls/:shortURL/delete", (req, res) => {
-  delete urlDatabase[req.params.shortURL]
+  delete urlDatabase[req.params.shortURL];
   res.redirect('/urls');
 });
 
@@ -83,15 +188,11 @@ app.post("/urls/:shortURL/update", (req, res) => {
   res.redirect('/urls');
 });
 
-app.post("/login", (req, res) => {
-  res.cookie('username', req.body.username);
+app.post("/logout", (req, res) => {
+  res.clearCookie('user_id');
   res.redirect('/urls');
 });
 
-app.post("/logout", (req, res) => {
-  res.clearCookie('username');
-  res.redirect('/urls');
-});
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);

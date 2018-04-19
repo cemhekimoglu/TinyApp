@@ -4,17 +4,15 @@
   <title> TinyApp Header </title>
 </head>
 <body>
-  <header>This will be a header</header>
-<% if(username){ %>
-   <p>username: <%= username %></p>
+  <header>TinyApp Project </header>
+<% if(user){ %>
+   <p>user: <%= user.email %></p>
    <form method="POST" action="/logout">
     <input type="submit" value="Logout">
   </form>
  <% } else{ %>
-  <form method="POST" action="/login">
-    <input type="text" name="username" placeholder="username">
-    <input type="submit" value="Submit">
-  </form>
+<a href="/urls/login">Login Now</a>
+<a href="/urls/register">Register Now</a>
   <% } %>
 
 </body>
