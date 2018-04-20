@@ -11,12 +11,17 @@
     <% for(var name in urls) { %>
       <li>
         <%= name %> : <a href="<%=urls[name]%>"><%= urls[name]["url"]%> </a>
+        <% if (user !== undefined) { %>
+            <% if(urls[name]["userID"] === user.id) {%>
         <a href="/urls/<%=name%>">Edit </a>
         <form method="POST" action="/urls/<%= name %>/delete"> <input type="SUBMIT" value="DELETE"></form>
+      <% } %>
+      <% } %>
+
       </li>
     <% } %>
   </ul>
-  <a href="">Shorter links!</a>
+  <a href="http://localhost:8080/urls/new">Let's Create Shorter links!</a>
 
 
 
