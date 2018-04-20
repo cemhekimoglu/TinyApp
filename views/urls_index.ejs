@@ -10,9 +10,9 @@
   <ul>
     <% for(var name in urls) { %>
       <li>
-        <%= name %> : <a href="<%=urls[name]%>"><%=urls[name]%> </a>
+        <%= name %> : <a href="<%=urls[name]%>"><%= urls[name]["url"]%> </a>
         <a href="/urls/<%=name%>">Edit </a>
-        <form method="POST" action="/urls/<%= name %>/delete"> <button type="button" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-trash"></span> DELETE </button></form>
+        <form method="POST" action="/urls/<%= name %>/delete"> <input type="SUBMIT" value="DELETE"></form>
       </li>
     <% } %>
   </ul>

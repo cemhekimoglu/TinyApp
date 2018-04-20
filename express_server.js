@@ -21,9 +21,11 @@ function generateRandomString() {
 }
 
 var urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  "b2xVn2": {url: "http://www.lighthouselabs.ca", userID: "userRandomID"},
+  "9sm5xK": {url: "http://www.google.com", userID: "user2RandomID"},
 };
+
+// urlDatabase.shortURL.userID = req.cookies.user_id
 
 const users = {
   "userRandomID": {
@@ -107,7 +109,7 @@ app.get("/urls/register", (req, res) => {
 
 app.get("/urls/login", (req, res) => {
   let templateVars = {
-    user: users[req.cookies[users]],
+    user: users[req.cookies[users]]
   };
   res.render("urls_login", templateVars);
 });
@@ -116,8 +118,15 @@ app.get("/urls/new", (req, res) => {
   let templateVars = {
     user: users[req.cookies["user_id"]]
   };
-  res.render("urls_new", templateVars);
+    if(templateVars.user === undefined) {
+    res.redirect('/urls/login')
+  } else {
+    res.render("urls_new", templateVars);
+  }
+
 });
+
+
 
 app.get("/u/:shortURL", (req, res) => {
   let longURL = urlDatabase[req.params.shortURL];
@@ -135,7 +144,10 @@ app.get("/urls/:id", (req, res) => {
 
 app.post("/urls", (req, res) => {
   var shortURL = generateRandomString();
-  urlDatabase[shortURL] = req.body.longURL;
+  let longURL = urlDatabase[req.params.shortURL];
+
+  urlDatabase[shortURL]['url'] = req.body.longURL;
+  urlDatabase[shortURL]['userID'] = req.cookies.user_id
   res.redirect('/urls');
 });
 
@@ -144,8 +156,6 @@ app.post("/urls", (req, res) => {
 app.post("/register", (req, res) => {
   var newId = generateRandomString();
   var foundEmail = testEmail(req.body.email)
-
-
 
   if(req.body.email.length === 0 || req.body.password.length === 0) {
   res.status(400).send('error : email and password can not be empty')
@@ -165,13 +175,12 @@ app.post("/register", (req, res) => {
 
 app.post("/login", (req, res) => {
   var userValid = userLogin(req.body.email, req.body.password)
+  console.log(userValid)
   if(req.body.email.length === 0 || req.body.password.length === 0) {
   res.status(400).send('error 400 : email and password can not be empty')
-  } else if(userValid) {
-    console.log('email', foundEmail, 'password', foundPassword)
+  } else if(!userValid) {
     res.status(403).send('error 403 : email or password does not match')
   } else {
-
     var user_id = retrieveUserId(req.body.email, req.body.password)
     res.cookie('user_id', user_id);
     res.redirect('/urls');
