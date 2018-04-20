@@ -151,6 +151,11 @@ app.get("/urls/new", (req, res) => {
 
 });
 
+app.get("/u/:shortURL", (req, res) => {
+  let longURL = urlDatabase[req.params.shortURL]['url'];
+  res.redirect(longURL);
+});
+
 
 
 app.get("/u/:shortURL", (req, res) => {

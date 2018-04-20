@@ -12,7 +12,7 @@
       <li>
         <a href=""><%=shortURL%> </a>
         <form method="POST" action="/urls/<%= shortURL %>/update">
-          <input type="text" name="longURL" placeholder="<%= longURL %>">
+          <input type="text" name="longURL" value="<%= longURL %>">
           <button>UPDATE</button></form>
       </li>
   </ul>
