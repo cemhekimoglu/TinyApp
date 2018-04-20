@@ -92,9 +92,15 @@ app.get("/hello", (req, res) => {
 
 app.get("/urls", (req, res) => {
   key = req.cookies["user_id"]
+  var urls = {};
+  for (var newkey in urlDatabase) {
+    if (key === urlDatabase[newkey].userID) {
+     urls[newkey] = urlDatabase[newkey];
+    }
+  };
   // console.log("/urls", req.cookies)
   let templateVars = {
-    urls: urlDatabase,
+    urls: urls,
     user: users[key]
   };
   res.render("urls_index", templateVars);
